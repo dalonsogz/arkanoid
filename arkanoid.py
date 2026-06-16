@@ -61,6 +61,7 @@ font = pygame.font.Font(None, int(20 * (scala_x + scala_y) / 2))
 # Puntuacion
 score = 0
 
+
 def collision_detection_overlap():
     global x, y, dx, dy, score
 
@@ -205,15 +206,18 @@ def collision_detection_paddle():
 
 def paint_score():
     text = font.render("Score: " + str(score), True, (255, 255, 255))
-    screen.blit(text, (10*scala_x, 10*scala_y))
+    screen.blit(text, (10 * scala_x, 10 * scala_y))
+
 
 def paint_game_over():
     text = font.render("G A M E    O V E R", True, (255, 255, 255))
     screen.blit(text, (WIDTH / 2 - text.get_width() / 2, HEIGHT / 2 - text.get_height() / 2))
 
+
 def paint_game_win():
     text = font.render("Y O U    W I N", True, (255, 255, 255))
     screen.blit(text, (WIDTH / 2 - text.get_width() / 2, HEIGHT / 2 - text.get_height() / 2))
+
 
 while running and win is None:
 
@@ -246,8 +250,7 @@ while running and win is None:
 
         # Colisión con la pala
         if not collision_detection_paddle():
-            # print("GAME OVER")
-            running = False
+            win = False
 
     # collision_detection_overlap()
 
@@ -264,7 +267,7 @@ while running and win is None:
     screen.fill((34, 34, 34))
 
     # Bloques
-    win = True
+    bricks_remaining = 0
     for c in range(brick_cols):
         for r in range(brick_rows):
 
@@ -281,7 +284,9 @@ while running and win is None:
                         brick_height
                     )
                 )
-                win = None
+                bricks_remaining += 1
+    if bricks_remaining == 0:
+        win = True
 
     # Bola
     pygame.draw.circle(
@@ -305,11 +310,10 @@ while running and win is None:
 
     paint_score()
 
-    if not running:
-        paint_game_over()
-
-    if win:
+    if win is True:
         paint_game_win()
+    elif win is False:
+        paint_game_over()
 
     pygame.display.flip()
 
