@@ -165,7 +165,7 @@ def collision_detection_before_position(old_x_pos, old_y_pos):
 
 
 running = True
-win = False
+win = None
 
 
 def collision_detection_paddle():
@@ -215,7 +215,7 @@ def paint_game_win():
     text = font.render("Y O U    W I N", True, (255, 255, 255))
     screen.blit(text, (WIDTH / 2 - text.get_width() / 2, HEIGHT / 2 - text.get_height() / 2))
 
-while running or not win:
+while running and win is None:
 
     clock.tick(100)  # Aproximadamente equivalente a setInterval(draw, 10)
 
@@ -281,7 +281,7 @@ while running or not win:
                         brick_height
                     )
                 )
-                win = False
+                win = None
 
     # Bola
     pygame.draw.circle(
@@ -310,7 +310,6 @@ while running or not win:
 
     if win:
         paint_game_win()
-        running = False
 
     pygame.display.flip()
 
