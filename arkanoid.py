@@ -114,6 +114,7 @@ def collision_detection_overlap():
                         y += overlap_bottom
 
                     brick["status"] = False
+                    sound_brick.play()
                     score += brick["score"]
 
 
@@ -161,6 +162,7 @@ def collision_detection_before_position(old_x_pos, old_y_pos):
                     dx = abs(dx)
 
                 brick["status"] = False
+                sound_brick.play()
                 score += brick["score"]
                 return
 
@@ -199,6 +201,8 @@ def collision_detection_paddle():
         dx = speed * math.sin(angle)
         dy = -abs(speed * math.cos(angle))
 
+        sound_paddle.play()
+
         return True
 
     return False
@@ -219,6 +223,19 @@ def paint_game_win():
     screen.blit(text, (WIDTH / 2 - text.get_width() / 2, HEIGHT / 2 - text.get_height() / 2))
 
 
+pygame.mixer.pre_init(44100, -16, 2, 512)
+pygame.init()
+sound_wall = pygame.mixer.Sound("sounds/wall.wav")
+sound_paddle = pygame.mixer.Sound("sounds/paddle.wav")
+sound_brick = pygame.mixer.Sound("sounds/brick.wav")
+sound_music_bg = pygame.mixer.Sound("sounds/music_bg.wav")
+sound_wall.set_volume(0.5)
+sound_paddle.set_volume(0.5)
+sound_brick.set_volume(0.5)
+sound_music_bg.set_volume(0.3)
+
+sound_music_bg.play(-1)  # fade_ms=1000)
+
 while running and win is None:
 
     clock.tick(100)  # Aproximadamente equivalente a setInterval(draw, 10)
@@ -226,6 +243,7 @@ while running and win is None:
     # Eventos
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            sound_music_bg.stop()
             running = False
 
     # Teclado
@@ -242,14 +260,20 @@ while running and win is None:
     # Colisiones con paredes
     if x + dx > WIDTH - ball_radius or x + dx < ball_radius:
         dx = -dx
+        sound_wall.play()
 
     if y + dy < ball_radius:
         dy = -dy
+        sound_wall.play()
 
     elif y + dy > HEIGHT - ball_radius:
 
         # Colisión con la pala
         if not collision_detection_paddle():
+            pygame.mixer.music.load("sounds/player_dies.wav")
+            pygame.mixer.music.play()
+            while pygame.mixer.music.get_busy():
+                pygame.time.wait(100)
             win = False
 
     # collision_detection_overlap()
@@ -312,10 +336,19 @@ while running and win is None:
 
     if win is True:
         paint_game_win()
+        sound_music_bg.stop()
+        pygame.mixer.music.load("sounds/win.mp3")
+        pygame.mixer.music.play()
     elif win is False:
         paint_game_over()
+        sound_music_bg.stop()
+        pygame.mixer.music.load("sounds/lose.mp3")
+        pygame.mixer.music.play()
 
     pygame.display.flip()
+
+while pygame.mixer.music.get_busy():
+    pygame.time.wait(100)
 
 time.sleep(3)
 
